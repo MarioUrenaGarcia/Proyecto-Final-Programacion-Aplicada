@@ -1,0 +1,10 @@
+*.jpg
+*.png
+*.o
+*.exe
+*~
+*.vscode
+*.txt
+sandbox.c
+*.pub
+*.bin
