@@ -88,8 +88,9 @@ struct interfazPrincipal
 
   // Ventana Principal--------------------
   GtkWidget *windowHome;
+  // Contenedor principal
   GtkWidget *mainboxHome;
-  // 3 cajas horizontales
+  // 4 cajas horizontales
   GtkWidget *terminales;
   GtkWidget *cliente;
   GtkWidget *acciones;
@@ -110,6 +111,10 @@ struct interfazPrincipal
   GtkWidget *atenderBtn;        // Botón
   GtkWidget *buscarBtn;         // Botón
   GtkWidget *accionesSeparator; // Separador
+  GtkWidget *buscarEntry;       // Entry
+
+  // Notificaciones
+  GtkWidget *notificacionesLbl; // Label
 
   // Variables de C --------------------------------
   nodoD *inicio, *fin; // Punteros a la lista doble

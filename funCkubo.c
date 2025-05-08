@@ -192,28 +192,33 @@ extern void guardarArbol(tipoHoja *aux, char nombreArchivo[])
  * @param nombreArchivo nombre del archivo que contiene el árbol
  * @return void
  */
-extern void cargarArbol(tipoHoja **aux, char nombreArchivo[])
-{
-    FILE *fp;
-    int numCta, pizzas, tacos;
-    float total;
-    char nombreCliente[30];
-
-    fp = fopen(nombreArchivo, "r");
-    if (fp == NULL)
-    {
-        printf(RED "\nERROR: No se pudo abrir el archivo arbol.bin\n" RESET);
-        exit(1);
-    }
-
-    while (fscanf(fp, "%d\t%s\t%d\t%d\t%f", &numCta, nombreCliente, &pizzas, &tacos, &total) == 5)
-    {
-        *aux = insertarHoja(*aux, numCta, nombreCliente, pizzas, tacos, total);
-    }
-    fclose(fp);
-
-    return;
-}
+ extern void cargarArbol(tipoHoja **aux, char nombreArchivo[])
+ {
+     FILE *fp;
+     int numCta, pizzas, tacos;
+     float total;
+     char nombreCliente[30];
+ 
+     fp = fopen(nombreArchivo, "r");
+     if (fp == NULL)
+     {
+         // Si no se puede abrir el archivo, se crea uno nuevo
+         fp = fopen(nombreArchivo, "w");
+         if (fp == NULL)
+         {
+             printf(RED "\nERROR: No se pudo crear el archivo arbol.txt\n" RESET);
+             exit(1);
+         }
+     }
+ 
+     while (fscanf(fp, "%d\t%s\t%d\t%d\t%f", &numCta, nombreCliente, &pizzas, &tacos, &total) == 5)
+     {
+         *aux = insertarHoja(*aux, numCta, nombreCliente, pizzas, tacos, total);
+     }
+     fclose(fp);
+ 
+     return;
+ }
 
 /**
  *@brief Función que imprime el árbol binario

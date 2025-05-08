@@ -31,6 +31,7 @@ void imprimirArb(tipoHoja *aux);
 void closeTheApp(GtkWidget *window);
 void avanzarTerminal(GtkWidget *button, gpointer estructura);
 void retrocederTerminal(GtkWidget *button, gpointer estructura);
+void avanzarCliente(GtkWidget *button, gpointer estructura);
 // Main ----------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -163,29 +164,28 @@ int main(int argc, char *argv[])
   principal.terminalInfoLbl = gtk_label_new(label);
   sprintf(label, "Cuenta: %d, Nombre: %s, Monedero: %.2f", principal.terminalActual->primero->numCuenta, principal.terminalActual->primero->nombre, principal.terminalActual->primero->monedero);
   principal.clienteInfoLbl = gtk_label_new(label);
+  principal.notificacionesLbl = gtk_label_new("Notificaciones");
   /*2b. Botones*/
   principal.terminalBackBtn = gtk_button_new_with_label("<-");
-  ;
   principal.terminalNextBtn = gtk_button_new_with_label("->");
-  ;
   principal.clienteBackBtn = gtk_button_new_with_label("<-");
-  ;
   principal.clienteNextBtn = gtk_button_new_with_label("->");
-  ;
   principal.atenderBtn = gtk_button_new_with_label("ATENDER");
-  ;
   principal.buscarBtn = gtk_button_new_with_label("BUSCAR");
-  ;
   /*2b. Separadores*/
-  principal.accionesSeparator = gtk_hseparator_new();
+  principal.accionesSeparator = gtk_vseparator_new();
   principal.clienteEndSeparator = gtk_hseparator_new();
   principal.terminalEndSeparator = gtk_hseparator_new();
   principal.clienteInfoSeparator = gtk_hseparator_new();
+  /*2b. Entries*/
+  principal.buscarEntry = gtk_entry_new();
+  gtk_entry_set_text(GTK_ENTRY(principal.buscarEntry), "Introduzca # de cuenta del cliente");
 
   /*3. Registro de los Callbacks */
   g_signal_connect(GTK_OBJECT(principal.windowHome), "destroy", GTK_SIGNAL_FUNC(closeTheApp), NULL);
   g_signal_connect(GTK_OBJECT(principal.terminalNextBtn), "clicked", GTK_SIGNAL_FUNC(avanzarTerminal), &principal);
   g_signal_connect(GTK_OBJECT(principal.terminalBackBtn), "clicked", GTK_SIGNAL_FUNC(retrocederTerminal), &principal);
+  g_signal_connect(GTK_OBJECT(principal.clienteNextBtn), "clicked", GTK_SIGNAL_FUNC(avanzarCliente), &principal);
   /* 4. Define jerarquía de instancias (pack the widgets)*/
   // Terminales
   gtk_box_pack_start_defaults(GTK_BOX(principal.terminales), principal.terminalBackBtn);
@@ -198,6 +198,7 @@ int main(int argc, char *argv[])
   // Acciones
   gtk_box_pack_start_defaults(GTK_BOX(principal.acciones), principal.atenderBtn);
   gtk_box_pack_start_defaults(GTK_BOX(principal.acciones), principal.accionesSeparator);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.acciones), principal.buscarEntry);
   gtk_box_pack_start_defaults(GTK_BOX(principal.acciones), principal.buscarBtn);
 
   // ORDEN WINDOW HOME
@@ -208,6 +209,7 @@ int main(int argc, char *argv[])
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.clienteInfoLbl);
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.clienteInfoSeparator);
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.acciones);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.notificacionesLbl);
 
   gtk_container_add(GTK_CONTAINER(principal.windowHome), principal.mainboxHome); // Caja principal en ventana
   /* 5. Mostrar los widgets */

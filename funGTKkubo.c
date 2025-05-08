@@ -54,6 +54,9 @@ extern void avanzarTerminal(GtkWidget *button, gpointer estructura)
       sprintf(label, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
       gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), label);
     }
+
+    // Notifica que se avanzó a la siguiente terminal
+    gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste a la siguiente terminal");
   }
 
   return;
@@ -87,6 +90,48 @@ extern void retrocederTerminal(GtkWidget *button, gpointer estructura)
       // Actualiza la etiqueta del cliente
       sprintf(label, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
       gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), label);
+    }
+
+    // Notifica que se retrocedió a la terminal anterior
+    gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Retrocediste a la terminal anterior");
+  }
+
+  return;
+}
+
+// Función que avanza al siguiente cliente
+extern void avanzarCliente(GtkWidget *button, gpointer estructura)
+{
+  inter *pt = (inter *)estructura;
+  char label[100];
+
+  // Si la fila de clientes no está vacía
+  if (pt->clienteActual != NULL)
+  {
+    // Si el cliente actual no es el último, avanza al siguiente
+    if (pt->clienteActual->next != NULL)
+    {
+      // Avanza al siguiente cliente
+      pt->clienteActual = pt->clienteActual->next;
+
+      // Actualiza la etiqueta del cliente
+      sprintf(label, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), label);
+
+      // Notifica que se avanzó al siguiente cliente
+      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste al siguiente cliente");
+    }
+    else
+    {
+      // Si el cliente actual es el último, regresa al inicio
+      pt->clienteActual = pt->terminalActual->primero;
+
+      // Actualiza la etiqueta del cliente
+      sprintf(label, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), label);
+
+      // Si el cliente actual es el último, notifica que no hay más clientes en la fila y regresa al inicio
+      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay más clientes en la fila, iniciando de nuevo");
     }
   }
 
