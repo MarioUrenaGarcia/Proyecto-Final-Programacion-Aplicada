@@ -81,6 +81,12 @@ tipoHoja *insertarHoja(tipoHoja *pt, int numCta, char nombreCliente[], int pizza
     return pt;
 }
 
+/**
+ * @brief Función que devuelve el cliente que tiene el número de cuenta indicado
+ * @param aux puntero al nodo raiz del árbol
+ * @param numCta número de cuenta del cliente
+ * @return cliente
+ */
 tipoHoja historialCliente(tipoHoja *aux, int numCta)
 {
     tipoHoja cliente;
