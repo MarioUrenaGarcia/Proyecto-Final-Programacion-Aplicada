@@ -129,8 +129,15 @@ struct interfazPrincipal
 
   // Ventana de atención--------------------
   GtkWidget *windowAtencion;
-  // Contenedor principal
   GtkWidget *mainboxAtencion;
+  GtkWidget *atencionComida;
+  GtkWidget *atencionCantidad;
+  GtkWidget *atencionLbl;       // Label
+  GtkWidget *atencionLbl2;      // Label
+  GtkWidget *atencionEntry;     // Entry
+  GtkWidget *atencionEntry2;    // Entry
+  GtkWidget *atencionBtn;       // Botón
+  GtkWidget *atencionSeparator; // Separador
 
   // Variables de C --------------------------------
   nodoD *inicio, *fin; // Punteros a la lista doble

@@ -9,7 +9,7 @@
 
 int buscarCliente(tipoHoja *aux, int numCta);
 tipoHoja historialCliente(tipoHoja *aux, int numCta);
-void atenderCaja(nodoD **caja, tipoHoja **arbol);
+void atenderCaja(nodoD **caja, tipoHoja **arbol, int cantidad, char comida[]);
 void borrarCliente(nodoD **terminal);
 // Funciones ----------------------------------------------------------------------------
 
@@ -222,25 +222,41 @@ extern void buscarHistorial(GtkWidget *button, gpointer estructura)
   return;
 }
 
-// Función para atender terminales
-extern void atender(GtkWidget *button, gpointer estructura)
+extern void atenderCajaGTK(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
 
   char auxString[100];
 
-  // Si la terminal actual es caja
-  if (strcmp(pt->terminalActual->terminal, "Caja") == 0)
+  char comida[20];
+  int cantidad;
+  // Si la caja está vacía
+  if (pt->terminalActual->primero == NULL)
   {
-    // Si la caja está vacía
-    if (pt->terminalActual->primero == NULL)
+    // Notifica que no hay clientes en la fila
+    gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay clientes en la fila");
+  }
+  else // Si la caja no está vacía
+  {
+    // Obtiene la comida y la cantidad del entry
+    sscanf(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry)), "%s", comida);
+    sscanf(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry2)), "%d", &cantidad);
+
+    // Si la comida es invalida
+    if ((strcmp(comida, "Pizzas") != 0) && (strcmp(comida, "Tacos") != 0))
     {
-      // Notifica que no hay clientes en la fila
-      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay clientes en la fila");
+      // Notifica que la comida es inválida
+      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Comida inválida");
     }
-    else // Si la caja no está vacía
+    // Si la cantidad es inválida
+    else if (cantidad <= 0)
     {
-      atenderCaja(&pt->terminalActual, &pt->raiz);
+      // Notifica que la cantidad es inválida
+      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Cantidad inválida");
+    }
+    else
+    {
+      atenderCaja(&pt->terminalActual, &pt->raiz, cantidad, comida);
       borrarCliente(&pt->terminalActual);
 
       pt->clienteActual = pt->clienteActual->next;
@@ -257,6 +273,38 @@ extern void atender(GtkWidget *button, gpointer estructura)
       gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Caja Atendida");
 
       printf(GREEN "\nCaja atendida\n" RESET);
+
+      // Reiniciar entries
+      gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry), "Pizzas / Tacos");
+      gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry2), "Cantidad");
+      // Oculta la ventana de atención
+      gtk_widget_hide_all(pt->windowAtencion);
+    }
+  }
+}
+// Función para atender terminales
+extern void atender(GtkWidget *button, gpointer estructura)
+{
+  inter *pt = (inter *)estructura;
+
+  char auxString[100];
+
+  // Si la terminal actual es caja
+  if (strcmp(pt->terminalActual->terminal, "Caja") == 0)
+  {
+    if (pt->terminalActual->primero != NULL) // Si la fila de clientes no está vacía
+    {
+      gtk_widget_show_all(pt->windowAtencion);
+
+      // Notifica que se está atendiendo la caja
+      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Atendiendo caja");
+    }
+    else // Si la fila de clientes está vacía
+    {
+      // Oculta la ventana de atención
+      gtk_widget_hide_all(pt->windowAtencion);
+      // Notifica que no hay clientes en la fila
+      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay clientes en la fila");
     }
   }
   // Si la terminal actual es de comida

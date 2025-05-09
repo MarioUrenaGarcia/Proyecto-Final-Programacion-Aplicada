@@ -33,6 +33,7 @@ void avanzarCliente(GtkWidget *button, gpointer estructura);
 void buscarHistorial(GtkWidget *button, gpointer estructura);
 void ocultarSearch(GtkWidget *button, gpointer estructura);
 void atender(GtkWidget *button, gpointer estructura);
+void atenderCajaGTK(GtkWidget *button, gpointer estructura);
 // Main ----------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -135,14 +136,6 @@ int main(int argc, char *argv[])
 
   printf("\n\tInicio de la aplicación\n\t");
 
-  /**
-   *
-   *
-   *
-   *
-   *
-   */
-
   // Procesos GTK ------------------------------------------------------------------------
   /* 1. Inicializar el ambiente */
   gtk_init(&argc, &argv);
@@ -160,6 +153,12 @@ int main(int argc, char *argv[])
   gtk_window_set_title(GTK_WINDOW(principal.windowSearch), "Busqueda de cliente");
   gtk_container_set_border_width(GTK_CONTAINER(principal.windowSearch), 10);
 
+  // Ventana de atención
+  principal.windowAtencion = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size(GTK_WINDOW(principal.windowAtencion), 50, 100);
+  gtk_window_set_title(GTK_WINDOW(principal.windowAtencion), "Atención de cliente");
+  gtk_container_set_border_width(GTK_CONTAINER(principal.windowAtencion), 10);
+
   /*2b. Imagen*/
   sprintf(auxString, "imagenes/%s.jpg", principal.terminalActual->primero->nombre);
   principal.clienteImg = gtk_image_new_from_file(auxString);
@@ -171,6 +170,10 @@ int main(int argc, char *argv[])
   principal.acciones = gtk_hbox_new(FALSE, 5);
 
   principal.mainboxSearch = gtk_vbox_new(FALSE, 10);
+
+  principal.mainboxAtencion = gtk_vbox_new(FALSE, 10);
+  principal.atencionComida = gtk_hbox_new(FALSE, 1);
+  principal.atencionCantidad = gtk_hbox_new(FALSE, 1);
   /*2b. Etiquetas*/
   sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", principal.terminalActual->terminal, principal.terminalActual->clientes, principal.terminalActual->montoAcumulado);
   principal.terminalInfoLbl = gtk_label_new(auxString);
@@ -181,6 +184,10 @@ int main(int argc, char *argv[])
   principal.searchInfoLbl = gtk_label_new("Datos de Cliente");
   principal.searchInfoLbl2 = gtk_label_new("Datos de Compras");
   principal.searchInfoLbl3 = gtk_label_new("Compra Acumulada");
+
+  principal.atencionLbl = gtk_label_new("Pedir: ");
+  principal.atencionLbl2 = gtk_label_new("Cantidad: ");
+
   /*2b. Botones*/
   principal.terminalNextBtn = gtk_button_new_with_label("->");
   principal.terminalBackBtn = gtk_button_new_with_label("<-");
@@ -189,6 +196,8 @@ int main(int argc, char *argv[])
   principal.buscarBtn = gtk_button_new_with_label("BUSCAR");
 
   principal.searchBtn = gtk_button_new_with_label("OK");
+
+  principal.atencionBtn = gtk_button_new_with_label("ATENDER");
   /*2b. Separadores*/
   principal.accionesSeparator = gtk_vseparator_new();
   principal.clienteMidSeparator = gtk_vseparator_new();
@@ -197,9 +206,16 @@ int main(int argc, char *argv[])
   principal.clienteInfoSeparator = gtk_hseparator_new();
 
   principal.searchSeparator = gtk_hseparator_new();
+
+  principal.atencionSeparator = gtk_hseparator_new();
   /*2b. Entries*/
   principal.buscarEntry = gtk_entry_new();
   gtk_entry_set_text(GTK_ENTRY(principal.buscarEntry), "Introduzca # de cuenta del cliente");
+
+  principal.atencionEntry = gtk_entry_new();
+  gtk_entry_set_text(GTK_ENTRY(principal.atencionEntry), "Pizzas / Tacos");
+  principal.atencionEntry2 = gtk_entry_new();
+  gtk_entry_set_text(GTK_ENTRY(principal.atencionEntry2), "");
 
   /*3. Registro de los Callbacks */
   g_signal_connect(GTK_OBJECT(principal.windowHome), "destroy", GTK_SIGNAL_FUNC(closeTheApp), NULL);
@@ -209,6 +225,8 @@ int main(int argc, char *argv[])
   g_signal_connect(GTK_OBJECT(principal.buscarBtn), "clicked", GTK_SIGNAL_FUNC(buscarHistorial), &principal);
   g_signal_connect(GTK_OBJECT(principal.searchBtn), "clicked", GTK_SIGNAL_FUNC(ocultarSearch), &principal);
   g_signal_connect(GTK_OBJECT(principal.atenderBtn), "clicked", GTK_SIGNAL_FUNC(atender), &principal);
+  g_signal_connect(GTK_OBJECT(principal.atencionBtn), "clicked", GTK_SIGNAL_FUNC(atenderCajaGTK), &principal);
+
   /* 4. Define jerarquía de instancias (pack the widgets)*/
   // Terminales
   gtk_box_pack_start_defaults(GTK_BOX(principal.terminales), principal.terminalBackBtn);
@@ -243,6 +261,20 @@ int main(int argc, char *argv[])
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchSeparator);
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchBtn);
   gtk_container_add(GTK_CONTAINER(principal.windowSearch), principal.mainboxSearch); // Caja principal en ventana
+
+  // ORDEN WINDOW ATENCION
+  // Caja de comida
+  gtk_box_pack_start_defaults(GTK_BOX(principal.atencionComida), principal.atencionLbl);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.atencionComida), principal.atencionEntry);
+  // Caja de cantidad
+  gtk_box_pack_start_defaults(GTK_BOX(principal.atencionCantidad), principal.atencionLbl2);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.atencionCantidad), principal.atencionEntry2);
+  // Principal
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxAtencion), principal.atencionComida);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxAtencion), principal.atencionCantidad);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxAtencion), principal.atencionSeparator);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxAtencion), principal.atencionBtn);
+  gtk_container_add(GTK_CONTAINER(principal.windowAtencion), principal.mainboxAtencion); // Caja principal en ventana
 
   /* 5. Mostrar los widgets */
   gtk_widget_show_all(principal.windowHome);

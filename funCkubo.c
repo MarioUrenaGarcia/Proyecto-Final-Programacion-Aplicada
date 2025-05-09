@@ -625,9 +625,9 @@ extern void insertarCaja(nodoD **first, int numCuenta, char nombreCliente[], flo
  * @param **caja Puntero a la lista doble que contiene la terminal de caja.
  * @return void
  */
-extern void atenderCaja(nodoD **caja, tipoHoja **arbol)
+extern void atenderCaja(nodoD **caja, tipoHoja **arbol, int cantidad, char comida[])
 {
-    int cantidad, compraValida = 0;
+    int compraValida = 0;
     float pagar;
     nodoD *nodoCompra;      // Para ubicar la terminal de la compra
     nodoD *nodoFacturacion; // Para ubicar la terminal de facturacion
@@ -645,10 +645,7 @@ extern void atenderCaja(nodoD **caja, tipoHoja **arbol)
         // Atender a la caja eliminara al ultimo cliente de la cola FIFO y se copiaran sus datos a la terminal donde haya comprado
         printf("Atendiendo a %s " GREEN "$%.2f" RESET, clienteActual->nombre, clienteActual->monedero);
 
-        // Pizzas
-        printf("\nPizzas ($89.00) cantidad:  \n");
-        scanf("%d", &cantidad);
-        if (cantidad > 0)
+        if (strcmp(comida, "Pizzas") == 0) // Pizzas
         {
             pagar = cantidad * 89;
             if (pagar <= clienteActual->monedero)
@@ -664,7 +661,7 @@ extern void atenderCaja(nodoD **caja, tipoHoja **arbol)
                 compraValida = -1;
             }
         }
-        else // Tacos
+        else if (strcmp(comida, "Tacos") == 0) // Tacos
         {
             printf("\nTacos ($25.00) cantidad:  \n");
             scanf("%d", &cantidad);
