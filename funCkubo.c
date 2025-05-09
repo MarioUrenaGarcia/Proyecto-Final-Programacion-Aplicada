@@ -721,9 +721,6 @@ extern void atenderCaja(nodoD **caja, tipoHoja **arbol, int cantidad, char comid
                 printf(GREEN "\nCliente actualizado en árbol" RESET);
             }
         }
-        // Actualizar valores de terminal
-        (*caja)->clientes--;
-        (*caja)->montoAcumulado -= clienteActual->monedero;
     }
 
     return;

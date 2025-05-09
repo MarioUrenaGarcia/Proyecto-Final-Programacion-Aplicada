@@ -92,6 +92,7 @@ extern gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estruct
     salir = FALSE;
     gtk_main_quit();
   }
+
   return salir;
 }
 
@@ -99,7 +100,7 @@ extern gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estruct
 extern void avanzarTerminal(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
-  char auxString[100];
+  char auxString[120];
 
   // Si la terminal actual no es la última, avanza a la siguiente
   if (pt->terminalActual->next != NULL)
@@ -110,29 +111,55 @@ extern void avanzarTerminal(GtkWidget *button, gpointer estructura)
     sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
     gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
 
-    // Actualiza la fila de clientes donde se encuentra el usuario
-    pt->clienteActual = pt->terminalActual->primero;
-
-    // Si la fila está vacía, no hay clientes
-    if (pt->clienteActual == NULL)
+    // Si la terminal es facturación
+    if (strcmp(pt->terminalActual->terminal, "Facturacion") == 0)
     {
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+      pt->facturaActual = pt->terminalActual->top;
+      // Si la pila de facturas está vacía, no hay clientes
+      if (pt->facturaActual == NULL)
+      {
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
 
-      // Actualiza la imagen del cliente
-      sprintf(auxString, "imagenes/exito.jpg");
-      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+        // Actualiza la imagen del cliente
+        sprintf(auxString, "imagenes/exito.jpg");
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
+      else
+      {
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Factura: %d, Nombre: %s, Compra: %s, Total: %.2f", pt->facturaActual->numFactura, pt->facturaActual->nombre, pt->facturaActual->compra, pt->facturaActual->totalFacturado);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->facturaActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
     }
     else
     {
-      // Actualiza la etiqueta del cliente
-      sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+      // Actualiza la fila de clientes donde se encuentra el usuario
+      pt->clienteActual = pt->terminalActual->primero;
 
-      // Actualiza imagen del cliente
-      sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
-      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      // Si la fila está vacía, no hay clientes
+      if (pt->clienteActual == NULL)
+      {
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+
+        // Actualiza la imagen del cliente
+        sprintf(auxString, "imagenes/exito.jpg");
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
+      else
+      {
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
     }
-
     // Notifica que se avanzó a la siguiente terminal
     gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste a la siguiente terminal");
   }
@@ -144,9 +171,9 @@ extern void avanzarTerminal(GtkWidget *button, gpointer estructura)
 extern void retrocederTerminal(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
-  char auxString[100];
+  char auxString[120];
 
-  // Si la terminal actual no es la primera, retrocede a la anterior
+  // Si la terminal actual no es la última, avanza a la siguiente
   if (pt->terminalActual->back != NULL)
   {
     pt->terminalActual = pt->terminalActual->back;
@@ -155,31 +182,57 @@ extern void retrocederTerminal(GtkWidget *button, gpointer estructura)
     sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
     gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
 
-    // Actualiza la fila de clientes donde se encuentra el usuario
-    pt->clienteActual = pt->terminalActual->primero;
-
-    // Si la fila está vacía, no hay clientes
-    if (pt->clienteActual == NULL)
+    // Si la terminal es facturación
+    if (strcmp(pt->terminalActual->terminal, "Facturacion") == 0)
     {
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+      pt->facturaActual = pt->terminalActual->top;
+      // Si la pila de facturas está vacía, no hay clientes
+      if (pt->facturaActual == NULL)
+      {
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
 
-      // Actualiza la imagen del cliente
-      sprintf(auxString, "imagenes/exito.jpg");
-      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+        // Actualiza la imagen del cliente
+        sprintf(auxString, "imagenes/exito.jpg");
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
+      else
+      {
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Factura: %d, Nombre: %s, Compra: %s, Total: %.2f", pt->facturaActual->numFactura, pt->facturaActual->nombre, pt->facturaActual->compra, pt->facturaActual->totalFacturado);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->facturaActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
     }
     else
     {
-      // Actualiza la etiqueta del cliente
-      sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+      // Actualiza la fila de clientes donde se encuentra el usuario
+      pt->clienteActual = pt->terminalActual->primero;
 
-      // Actualiza imagen del cliente
-      sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
-      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      // Si la fila está vacía, no hay clientes
+      if (pt->clienteActual == NULL)
+      {
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+
+        // Actualiza la imagen del cliente
+        sprintf(auxString, "imagenes/exito.jpg");
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
+      else
+      {
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
     }
-
-    // Notifica que se retrocedió a la terminal anterior
-    gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Retrocediste a la terminal anterior");
+    // Notifica que se avanzó a la siguiente terminal
+    gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste a la siguiente terminal");
   }
 
   return;
@@ -189,43 +242,95 @@ extern void retrocederTerminal(GtkWidget *button, gpointer estructura)
 extern void avanzarCliente(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
-  char auxString[100];
+  char auxString[120];
 
-  // Si la fila de clientes no está vacía
-  if (pt->clienteActual != NULL)
+  // Si la terminal actual es facturación
+  if (strcmp(pt->terminalActual->terminal, "Facturacion") == 0)
   {
-    // Si el cliente actual no es el último, avanza al siguiente
-    if (pt->clienteActual->next != NULL)
+    // Si la pila de facturas está vacía, no hay clientes
+    if (pt->facturaActual == NULL)
     {
-      // Avanza al siguiente cliente
-      pt->clienteActual = pt->clienteActual->next;
+      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
 
-      // Actualiza la etiqueta del cliente
-      sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
-
-      // Actualiza imagen del cliente
-      sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+      // Actualiza la imagen del cliente
+      sprintf(auxString, "imagenes/exito.jpg");
       gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
-
-      // Notifica que se avanzó al siguiente cliente
-      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste al siguiente cliente");
     }
     else
     {
-      // Si el cliente actual es el último, regresa al inicio
-      pt->clienteActual = pt->terminalActual->primero;
+      // Si no es la última factura, avanza la siguiente factura
+      if (pt->facturaActual->next != NULL)
+      {
+        // Si la pila de facturas no está vacía, avanza al siguiente cliente
+        pt->facturaActual = pt->facturaActual->next;
 
-      // Actualiza la etiqueta del cliente
-      sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Factura: %d, Nombre: %s, Compra: %s, Total: %.2f", pt->facturaActual->numFactura, pt->facturaActual->nombre, pt->facturaActual->compra, pt->facturaActual->totalFacturado);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
 
-      // Actualiza imagen del cliente
-      sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
-      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->facturaActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
 
-      // Si el cliente actual es el último, notifica que no hay más clientes en la fila y regresa al inicio
-      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay más clientes en la fila, iniciando de nuevo");
+        // Notifica que se avanzó al siguiente cliente
+        gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste a la siguiente factura");
+      }
+      else
+      {
+        // Si la factura actual es la última, regresa al inicio
+        pt->facturaActual = pt->terminalActual->top;
+
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Factura: %d, Nombre: %s, Compra: %s, Total: %.2f", pt->facturaActual->numFactura, pt->facturaActual->nombre, pt->facturaActual->compra, pt->facturaActual->totalFacturado);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->facturaActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+        // Si el cliente actual es el último, notifica que no hay más clientes en la fila y regresa al inicio
+        gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay más facturas en la pila, iniciando de nuevo");
+      }
+    }
+  }
+  else
+  {
+    // Si la fila de clientes no está vacía
+    if (pt->clienteActual != NULL)
+    {
+      // Si el cliente actual no es el último, avanza al siguiente
+      if (pt->clienteActual->next != NULL)
+      {
+        // Avanza al siguiente cliente
+        pt->clienteActual = pt->clienteActual->next;
+
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+        // Notifica que se avanzó al siguiente cliente
+        gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste al siguiente cliente");
+      }
+      else
+      {
+        // Si el cliente actual es el último, regresa al inicio
+        pt->clienteActual = pt->terminalActual->primero;
+
+        // Actualiza la etiqueta del cliente
+        sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+        // Actualiza imagen del cliente
+        sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+        // Si el cliente actual es el último, notifica que no hay más clientes en la fila y regresa al inicio
+        gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay más clientes en la fila, iniciando de nuevo");
+      }
     }
   }
 
@@ -331,9 +436,13 @@ extern void atenderCajaGTK(GtkWidget *button, gpointer estructura)
 
       printf(GREEN "\nCaja atendida\n" RESET);
 
+      // Actualiza la etiqueta de la terminal
+      sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+      gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+
       // Reiniciar entries
       gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry), "Pizzas / Tacos");
-      gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry2), "Cantidad");
+      gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry2), "");
       // Oculta la ventana de atención
       gtk_widget_hide_all(pt->windowAtencion);
     }
@@ -386,9 +495,16 @@ extern void atender(GtkWidget *button, gpointer estructura)
         // Actualiza la etiqueta del cliente
         gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
 
+        // Actualiza la etiqueta de la terminal
+        sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+        gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+
         // Actualiza la imagen del cliente
         sprintf(auxString, "imagenes/exito.jpg");
         gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+        // Notifica que atendió la comida
+        gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Terminal atendida");
       }
       else
       {
@@ -400,12 +516,15 @@ extern void atender(GtkWidget *button, gpointer estructura)
         sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
         gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
 
+        // Actualiza la etiqueta de la terminal
+        sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+        gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+
         // Notifica que se avanzó al siguiente cliente
         gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Comida Atendida");
       }
     }
   }
-  // Si la terminal actual es de facturación
 
   return;
 }
