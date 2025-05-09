@@ -4,7 +4,7 @@
  * @brief Breve Descripción
  * @details Descripción extendida
  * @date
- * @author Mario Ureña García
+ * @author
  *
  */
 
@@ -16,8 +16,6 @@ void insertarColaD(nodoD **first, nodoD **last, char nombreCola[], int tickets, 
 int menuOpciones(nodoD *aux);
 void insertarCaja(nodoD **first, int numCuenta, char nombreCliente[], float monedero);
 void existenTerminalesFundamentales(nodoD *aux);
-void atenderCaja(nodoD **caja, tipoHoja **arbol);
-void borrarCliente(nodoD **terminal);
 void crearArchivoFacturas(char nombreArchivo[], nodoD *aux);
 int verificarColas(nodoD *aux);
 void crearArchivoClientes(char nombreArchivo[], nodoD *aux);
@@ -32,6 +30,9 @@ void closeTheApp(GtkWidget *window);
 void avanzarTerminal(GtkWidget *button, gpointer estructura);
 void retrocederTerminal(GtkWidget *button, gpointer estructura);
 void avanzarCliente(GtkWidget *button, gpointer estructura);
+void buscarHistorial(GtkWidget *button, gpointer estructura);
+void ocultarSearch(GtkWidget *button, gpointer estructura);
+void atender(GtkWidget *button, gpointer estructura);
 // Main ----------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
   FILE *fp;
 
   // Variable de apoyo para iniciar labels
-  char label[100];
+  char auxString[100];
 
   // Variables Gtk -----------------------------------------------------------------------
 
@@ -152,31 +153,50 @@ int main(int argc, char *argv[])
   gtk_window_set_default_size(GTK_WINDOW(principal.windowHome), 600, 200);
   gtk_window_set_title(GTK_WINDOW(principal.windowHome), "El Kubo");
   gtk_container_set_border_width(GTK_CONTAINER(principal.windowHome), 10);
+
+  // Ventana de búsqueda
+  principal.windowSearch = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size(GTK_WINDOW(principal.windowSearch), 100, 300);
+  gtk_window_set_title(GTK_WINDOW(principal.windowSearch), "Busqueda de cliente");
+  gtk_container_set_border_width(GTK_CONTAINER(principal.windowSearch), 10);
+
   /*2b. Imagen*/
-  principal.clienteImg = gtk_image_new_from_file("test250.jpg");
+  sprintf(auxString, "imagenes/%s.jpg", principal.terminalActual->primero->nombre);
+  principal.clienteImg = gtk_image_new_from_file(auxString);
+  principal.searchImg = gtk_image_new_from_file(auxString);
   /*2b. Contenedores*/
   principal.mainboxHome = gtk_vbox_new(FALSE, 10);
   principal.terminales = gtk_hbox_new(FALSE, 5);
   principal.cliente = gtk_hbox_new(FALSE, 5);
   principal.acciones = gtk_hbox_new(FALSE, 5);
+
+  principal.mainboxSearch = gtk_vbox_new(FALSE, 10);
   /*2b. Etiquetas*/
-  sprintf(label, "Terminal %s, %d clientes, $ %.2f", principal.terminalActual->terminal, principal.terminalActual->clientes, principal.terminalActual->montoAcumulado);
-  principal.terminalInfoLbl = gtk_label_new(label);
-  sprintf(label, "Cuenta: %d, Nombre: %s, Monedero: %.2f", principal.terminalActual->primero->numCuenta, principal.terminalActual->primero->nombre, principal.terminalActual->primero->monedero);
-  principal.clienteInfoLbl = gtk_label_new(label);
+  sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", principal.terminalActual->terminal, principal.terminalActual->clientes, principal.terminalActual->montoAcumulado);
+  principal.terminalInfoLbl = gtk_label_new(auxString);
+  sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", principal.terminalActual->primero->numCuenta, principal.terminalActual->primero->nombre, principal.terminalActual->primero->monedero);
+  principal.clienteInfoLbl = gtk_label_new(auxString);
   principal.notificacionesLbl = gtk_label_new("Notificaciones");
+
+  principal.searchInfoLbl = gtk_label_new("Datos de Cliente");
+  principal.searchInfoLbl2 = gtk_label_new("Datos de Compras");
+  principal.searchInfoLbl3 = gtk_label_new("Compra Acumulada");
   /*2b. Botones*/
-  principal.terminalBackBtn = gtk_button_new_with_label("<-");
   principal.terminalNextBtn = gtk_button_new_with_label("->");
-  principal.clienteBackBtn = gtk_button_new_with_label("<-");
+  principal.terminalBackBtn = gtk_button_new_with_label("<-");
   principal.clienteNextBtn = gtk_button_new_with_label("->");
   principal.atenderBtn = gtk_button_new_with_label("ATENDER");
   principal.buscarBtn = gtk_button_new_with_label("BUSCAR");
+
+  principal.searchBtn = gtk_button_new_with_label("OK");
   /*2b. Separadores*/
   principal.accionesSeparator = gtk_vseparator_new();
+  principal.clienteMidSeparator = gtk_vseparator_new();
   principal.clienteEndSeparator = gtk_hseparator_new();
   principal.terminalEndSeparator = gtk_hseparator_new();
   principal.clienteInfoSeparator = gtk_hseparator_new();
+
+  principal.searchSeparator = gtk_hseparator_new();
   /*2b. Entries*/
   principal.buscarEntry = gtk_entry_new();
   gtk_entry_set_text(GTK_ENTRY(principal.buscarEntry), "Introduzca # de cuenta del cliente");
@@ -186,13 +206,16 @@ int main(int argc, char *argv[])
   g_signal_connect(GTK_OBJECT(principal.terminalNextBtn), "clicked", GTK_SIGNAL_FUNC(avanzarTerminal), &principal);
   g_signal_connect(GTK_OBJECT(principal.terminalBackBtn), "clicked", GTK_SIGNAL_FUNC(retrocederTerminal), &principal);
   g_signal_connect(GTK_OBJECT(principal.clienteNextBtn), "clicked", GTK_SIGNAL_FUNC(avanzarCliente), &principal);
+  g_signal_connect(GTK_OBJECT(principal.buscarBtn), "clicked", GTK_SIGNAL_FUNC(buscarHistorial), &principal);
+  g_signal_connect(GTK_OBJECT(principal.searchBtn), "clicked", GTK_SIGNAL_FUNC(ocultarSearch), &principal);
+  g_signal_connect(GTK_OBJECT(principal.atenderBtn), "clicked", GTK_SIGNAL_FUNC(atender), &principal);
   /* 4. Define jerarquía de instancias (pack the widgets)*/
   // Terminales
   gtk_box_pack_start_defaults(GTK_BOX(principal.terminales), principal.terminalBackBtn);
   gtk_box_pack_start_defaults(GTK_BOX(principal.terminales), principal.terminalInfoLbl);
   gtk_box_pack_start_defaults(GTK_BOX(principal.terminales), principal.terminalNextBtn);
   // Clientes
-  gtk_box_pack_start_defaults(GTK_BOX(principal.cliente), principal.clienteBackBtn);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.cliente), principal.clienteMidSeparator);
   gtk_box_pack_start_defaults(GTK_BOX(principal.cliente), principal.clienteImg);
   gtk_box_pack_start_defaults(GTK_BOX(principal.cliente), principal.clienteNextBtn);
   // Acciones
@@ -210,8 +233,17 @@ int main(int argc, char *argv[])
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.clienteInfoSeparator);
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.acciones);
   gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxHome), principal.notificacionesLbl);
-
   gtk_container_add(GTK_CONTAINER(principal.windowHome), principal.mainboxHome); // Caja principal en ventana
+
+  // ORDEN WINDOW SEARCH
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchImg);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchInfoLbl);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchInfoLbl2);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchInfoLbl3);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchSeparator);
+  gtk_box_pack_start_defaults(GTK_BOX(principal.mainboxSearch), principal.searchBtn);
+  gtk_container_add(GTK_CONTAINER(principal.windowSearch), principal.mainboxSearch); // Caja principal en ventana
+
   /* 5. Mostrar los widgets */
   gtk_widget_show_all(principal.windowHome);
 

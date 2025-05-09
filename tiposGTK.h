@@ -100,9 +100,9 @@ struct interfazPrincipal
   GtkWidget *terminalInfoLbl; // Label
   GtkWidget *terminalEndSeparator;
   // Cliente
-  GtkWidget *clienteBackBtn; // Botón
   GtkWidget *clienteNextBtn; // Botón
-  GtkWidget *clienteImg;     // Imagen
+  GtkWidget *clienteMidSeparator;
+  GtkWidget *clienteImg; // Imagen
   GtkWidget *clienteEndSeparator;
   // Datos Cliente
   GtkWidget *clienteInfoLbl; // Label
@@ -112,9 +112,25 @@ struct interfazPrincipal
   GtkWidget *buscarBtn;         // Botón
   GtkWidget *accionesSeparator; // Separador
   GtkWidget *buscarEntry;       // Entry
-
   // Notificaciones
   GtkWidget *notificacionesLbl; // Label
+
+  // Ventana de búsqueda--------------------
+  GtkWidget *windowSearch;
+  // Contenedor principal
+  GtkWidget *mainboxSearch;
+
+  GtkWidget *searchImg;       // Imagen
+  GtkWidget *searchInfoLbl;   // Label
+  GtkWidget *searchInfoLbl2;  // Label
+  GtkWidget *searchInfoLbl3;  // Label
+  GtkWidget *searchSeparator; // Separador
+  GtkWidget *searchBtn;       // Botón
+
+  // Ventana de atención--------------------
+  GtkWidget *windowAtencion;
+  // Contenedor principal
+  GtkWidget *mainboxAtencion;
 
   // Variables de C --------------------------------
   nodoD *inicio, *fin; // Punteros a la lista doble

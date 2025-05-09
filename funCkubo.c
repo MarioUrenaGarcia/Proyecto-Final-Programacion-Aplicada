@@ -81,6 +81,35 @@ tipoHoja *insertarHoja(tipoHoja *pt, int numCta, char nombreCliente[], int pizza
     return pt;
 }
 
+tipoHoja historialCliente(tipoHoja *aux, int numCta)
+{
+    tipoHoja cliente;
+    int encontrado = 0;
+
+    while (aux != NULL && encontrado == 0)
+    {
+        if (numCta == aux->numCuenta)
+        {
+            cliente.numCuenta = aux->numCuenta;
+            strcpy(cliente.nombre, aux->nombre);
+            cliente.numPizzas = aux->numPizzas;
+            cliente.numTacos = aux->numTacos;
+            cliente.compraAcumulada = aux->compraAcumulada;
+            encontrado = 1;
+        }
+        else if (numCta < aux->numCuenta)
+        {
+            aux = aux->izq;
+        }
+        else
+        {
+            aux = aux->der;
+        }
+    }
+
+    return cliente;
+}
+
 /**
  *@brief Función que busca un cliente en el árbol
  *@param aux puntero al nodo raiz del árbol
@@ -192,33 +221,33 @@ extern void guardarArbol(tipoHoja *aux, char nombreArchivo[])
  * @param nombreArchivo nombre del archivo que contiene el árbol
  * @return void
  */
- extern void cargarArbol(tipoHoja **aux, char nombreArchivo[])
- {
-     FILE *fp;
-     int numCta, pizzas, tacos;
-     float total;
-     char nombreCliente[30];
- 
-     fp = fopen(nombreArchivo, "r");
-     if (fp == NULL)
-     {
-         // Si no se puede abrir el archivo, se crea uno nuevo
-         fp = fopen(nombreArchivo, "w");
-         if (fp == NULL)
-         {
-             printf(RED "\nERROR: No se pudo crear el archivo arbol.txt\n" RESET);
-             exit(1);
-         }
-     }
- 
-     while (fscanf(fp, "%d\t%s\t%d\t%d\t%f", &numCta, nombreCliente, &pizzas, &tacos, &total) == 5)
-     {
-         *aux = insertarHoja(*aux, numCta, nombreCliente, pizzas, tacos, total);
-     }
-     fclose(fp);
- 
-     return;
- }
+extern void cargarArbol(tipoHoja **aux, char nombreArchivo[])
+{
+    FILE *fp;
+    int numCta, pizzas, tacos;
+    float total;
+    char nombreCliente[30];
+
+    fp = fopen(nombreArchivo, "r");
+    if (fp == NULL)
+    {
+        // Si no se puede abrir el archivo, se crea uno nuevo
+        fp = fopen(nombreArchivo, "w");
+        if (fp == NULL)
+        {
+            printf(RED "\nERROR: No se pudo crear el archivo arbol.txt\n" RESET);
+            exit(1);
+        }
+    }
+
+    while (fscanf(fp, "%d\t%s\t%d\t%d\t%f", &numCta, nombreCliente, &pizzas, &tacos, &total) == 5)
+    {
+        *aux = insertarHoja(*aux, numCta, nombreCliente, pizzas, tacos, total);
+    }
+    fclose(fp);
+
+    return;
+}
 
 /**
  *@brief Función que imprime el árbol binario
