@@ -11,6 +11,10 @@ int buscarCliente(tipoHoja *aux, int numCta);
 tipoHoja historialCliente(tipoHoja *aux, int numCta);
 void atenderCaja(nodoD **caja, tipoHoja **arbol, int cantidad, char comida[]);
 void borrarCliente(nodoD **terminal);
+int verificarColas(nodoD *aux);
+void crearArchivoFacturas(char nombreArchivo[], nodoD *aux);
+void crearArchivoClientes(char nombreArchivo[], nodoD *aux);
+void guardarArbol(tipoHoja *aux, char nombreArchivo[]);
 // Funciones ----------------------------------------------------------------------------
 
 /**
@@ -31,11 +35,64 @@ extern void ocultarSearch(GtkWidget *button, gpointer estructura)
   return;
 }
 
-extern void closeTheApp(GtkWidget *window)
+extern gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estructura)
 {
-  printf("\nPrograma Finalizado\n");
-  gtk_main_quit();
-  return;
+  inter *pt = (inter *)estructura;
+
+  gboolean salir = FALSE;
+
+  // Para el nombre del archivo de facturas y el comando para moverlo
+  time_t t = time(NULL);
+  struct tm tm = *localtime(&t);
+  char nombreArchivo[50];
+  char comando[120];
+
+  // No se puede cerrar el programa porque hay clientes en cola
+  if (verificarColas(pt->inicio) == 1)
+  {
+    gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No puedes cerrar el programa, hay clientes en cola");
+    salir = TRUE;
+  }
+  else
+  {
+    // Cuando se sale del programa, se almacenan los datos de las facturas en un archivo
+    // Se crea el archivo de facturas, el nombre debe tener la fecha y hora actual
+    sprintf(nombreArchivo, "facturas_%04d-%02d-%02d_%02d-%02d-%02d.txt", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    crearArchivoFacturas(nombreArchivo, pt->inicio);
+
+    // Crear carpeta para almacenar el archivo de facturas si no existe
+    if (system("mkdir -p facturas") == -1)
+    {
+      printf(RED "\n\n\tError al crear la carpeta de facturas\n\n" RESET);
+      exit(1);
+    }
+    // Mover el archivo de facturas a la carpeta de facturas
+    sprintf(comando, "mv %s facturas/%s", nombreArchivo, nombreArchivo);
+    if (system(comando) == -1)
+    {
+      printf(RED "\n\n\tError al mover el archivo de facturas\n\n" RESET);
+      exit(1);
+    }
+    else
+    {
+      printf(GREEN "\n\nArchivo de facturas creado con éxito\n\n" RESET);
+      printf(GREEN "El archivo de facturas se ha creado con el nombre " YELLOW "%s" RESET, nombreArchivo);
+    }
+
+    // Se crea el archivo de clientes restantes
+    crearArchivoClientes("clientes.txt", pt->inicio);
+    printf(GREEN "\n\nLos clientes restantes se han almacenado en \"clientes.txt\"\n\n" RESET);
+
+    // Se guarda el árbol binario en un archivo
+    guardarArbol(pt->raiz, "arbol.txt");
+    printf(GREEN "\n\nEl árbol binario se ha guardado en \"arbol.txt\"\n\n" RESET);
+
+    // Finalizar el programa
+    printf("\nPrograma Finalizado\n");
+    salir = FALSE;
+    gtk_main_quit();
+  }
+  return salir;
 }
 
 // Función que avanza a la siguiente terminal

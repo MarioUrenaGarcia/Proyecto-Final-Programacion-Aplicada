@@ -26,7 +26,7 @@ void guardarArbol(tipoHoja *aux, char nombreArchivo[]);
 void cargarArbol(tipoHoja **aux, char nombreArchivo[]);
 void imprimirArb(tipoHoja *aux);
 // Prototipos de GTK ---------------------------------------------------------------------
-void closeTheApp(GtkWidget *window);
+
 void avanzarTerminal(GtkWidget *button, gpointer estructura);
 void retrocederTerminal(GtkWidget *button, gpointer estructura);
 void avanzarCliente(GtkWidget *button, gpointer estructura);
@@ -36,6 +36,7 @@ void atender(GtkWidget *button, gpointer estructura);
 void atenderCajaGTK(GtkWidget *button, gpointer estructura);
 void ocultarVentanaAtencion(GtkWidget *button, gpointer estructura);
 
+gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estructura);
 gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
 // Main ----------------------------------------------------------------------------------
 int main(int argc, char *argv[])
@@ -50,12 +51,6 @@ int main(int argc, char *argv[])
   int numCuenta;
   char nombreCliente[20];
   float monedero;
-
-  // Para el nombre del archivo de facturas y el comando para moverlo
-  time_t t = time(NULL);
-  struct tm tm = *localtime(&t);
-  char nombreArchivo[50];
-  char comando[120];
 
   FILE *fp;
 
@@ -221,7 +216,8 @@ int main(int argc, char *argv[])
   gtk_entry_set_text(GTK_ENTRY(principal.atencionEntry2), "");
 
   /*3. Registro de los Callbacks */
-  g_signal_connect(GTK_OBJECT(principal.windowHome), "destroy", GTK_SIGNAL_FUNC(closeTheApp), NULL);
+  g_signal_connect(GTK_OBJECT(principal.windowHome), "delete-event", GTK_SIGNAL_FUNC(closeTheApp), &principal);
+
   g_signal_connect(GTK_OBJECT(principal.terminalNextBtn), "clicked", GTK_SIGNAL_FUNC(avanzarTerminal), &principal);
   g_signal_connect(GTK_OBJECT(principal.terminalBackBtn), "clicked", GTK_SIGNAL_FUNC(retrocederTerminal), &principal);
   g_signal_connect(GTK_OBJECT(principal.clienteNextBtn), "clicked", GTK_SIGNAL_FUNC(avanzarCliente), &principal);

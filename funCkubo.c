@@ -663,23 +663,18 @@ extern void atenderCaja(nodoD **caja, tipoHoja **arbol, int cantidad, char comid
         }
         else if (strcmp(comida, "Tacos") == 0) // Tacos
         {
-            printf("\nTacos ($25.00) cantidad:  \n");
-            scanf("%d", &cantidad);
-            if (cantidad > 0)
+            pagar = cantidad * 25;
+            if (pagar <= clienteActual->monedero)
             {
-                pagar = cantidad * 25;
-                if (pagar <= clienteActual->monedero)
-                {
-                    clienteActual->monedero -= pagar;
-                    printf(GREEN "\nCompra exitosa" RESET);
-                    compraValida = 1;
-                    nodoCompra = buscarNodo(*caja, "Tacos");
-                }
-                else
-                {
-                    printf(RED "\nNo tiene suficiente dinero\n" RESET);
-                    compraValida = -1;
-                }
+                clienteActual->monedero -= pagar;
+                printf(GREEN "\nCompra exitosa" RESET);
+                compraValida = 1;
+                nodoCompra = buscarNodo(*caja, "Tacos");
+            }
+            else
+            {
+                printf(RED "\nNo tiene suficiente dinero\n" RESET);
+                compraValida = -1;
             }
         }
 
