@@ -147,5 +147,7 @@ struct interfazPrincipal
   nodoD *terminalActual;
   // Variable que definirá en que cliente se encuentra el usuario posicionado en la interfaz
   nodoCola *clienteActual;
+
+  char nombreArchivoArbol[30]; // Nombre del archivo donde se guardará el árbol binario
 };
 typedef struct interfazPrincipal inter;

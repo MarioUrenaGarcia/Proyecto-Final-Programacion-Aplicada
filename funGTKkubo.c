@@ -84,8 +84,8 @@ extern gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estruct
     printf(GREEN "\n\nLos clientes restantes se han almacenado en \"clientes.txt\"\n\n" RESET);
 
     // Se guarda el árbol binario en un archivo
-    guardarArbol(pt->raiz, "arbol.txt");
-    printf(GREEN "\n\nEl árbol binario se ha guardado en \"arbol.txt\"\n\n" RESET);
+    guardarArbol(pt->raiz, pt->nombreArchivoArbol);
+    printf(GREEN "\n\nEl árbol binario se ha guardado en \"%s\"\n\n" RESET, pt->nombreArchivoArbol);
 
     // Finalizar el programa
     printf("\nPrograma Finalizado\n");

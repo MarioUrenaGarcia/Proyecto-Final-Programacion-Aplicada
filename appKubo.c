@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
     printf(GREEN "\nEl árbol binario se ha cargado con éxito" RESET);
     printf(YELLOW "\nImprimiendo árbol binario" RESET);
     imprimirArb(principal.raiz);
+    strcpy(principal.nombreArchivoArbol, argv[3]);
   }
 
   // Posicionar el puntero a la terminal de caja
