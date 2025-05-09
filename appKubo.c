@@ -34,6 +34,9 @@ void buscarHistorial(GtkWidget *button, gpointer estructura);
 void ocultarSearch(GtkWidget *button, gpointer estructura);
 void atender(GtkWidget *button, gpointer estructura);
 void atenderCajaGTK(GtkWidget *button, gpointer estructura);
+void ocultarVentanaAtencion(GtkWidget *button, gpointer estructura);
+
+gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
 // Main ----------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -227,6 +230,9 @@ int main(int argc, char *argv[])
   g_signal_connect(GTK_OBJECT(principal.atenderBtn), "clicked", GTK_SIGNAL_FUNC(atender), &principal);
   g_signal_connect(GTK_OBJECT(principal.atencionBtn), "clicked", GTK_SIGNAL_FUNC(atenderCajaGTK), &principal);
 
+  // Evitar destrucción de widgets al presionar la X
+  g_signal_connect(GTK_WIDGET(principal.windowSearch), "delete-event", G_CALLBACK(on_window_delete_event), NULL);
+  g_signal_connect(GTK_WIDGET(principal.windowAtencion), "delete-event", G_CALLBACK(on_window_delete_event), NULL);
   /* 4. Define jerarquía de instancias (pack the widgets)*/
   // Terminales
   gtk_box_pack_start_defaults(GTK_BOX(principal.terminales), principal.terminalBackBtn);

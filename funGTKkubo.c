@@ -352,3 +352,10 @@ extern void atender(GtkWidget *button, gpointer estructura)
 
   return;
 }
+
+// Función que evita la destrucción de widgets
+gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+  gtk_widget_hide(widget); // Oculta la ventana
+  return TRUE;             // Evita que la ventana se destruya
+}
