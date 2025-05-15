@@ -1,4 +1,4 @@
-#Este es el archivo de makefile para (NOMBRE DEL ARCHIVO PRINCIPAL)
+#Este es el archivo de makefile para appKubo.c
 
 appKubo.exe: appKubo.o funCkubo.o funGTKkubo.o
 	gcc appKubo.o funCkubo.o funGTKkubo.o -o appKubo.exe `pkg-config --libs gtk+-2.0`
