@@ -18,14 +18,11 @@ void guardarArbol(tipoHoja *aux, char nombreArchivo[]);
 // Funciones ----------------------------------------------------------------------------
 
 /**
- * @brief
- * @date
- * @author
- * @param
- * @return
- * @Ejemplo
+ * @brief Función que oculta la ventana de búsqueda.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
  */
-
 extern void ocultarSearch(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -35,6 +32,16 @@ extern void ocultarSearch(GtkWidget *button, gpointer estructura)
   return;
 }
 
+/**
+ * @brief Función para el cierre del programa, verifica si hay clientes en cola, crea
+ *        el archivo de facturas y lo mueve a la carpeta de facturas, actualiza el árbol,
+ *        y guarda el árbol en un archivo y actualiza el archivo de clientes restantes.
+ *        La función evita que se cierre el programa si hay clientes en cola.
+ * @param window puntero a la ventana que se cerrará
+ * @param event puntero al evento que se generó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return gboolean
+ */
 extern gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -96,7 +103,12 @@ extern gboolean closeTheApp(GtkWidget *window, GdkEvent *event, gpointer estruct
   return salir;
 }
 
-// Función que avanza a la siguiente terminal
+/**
+ * @brief Función que avanza a la siguiente terminal.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
+ */
 extern void avanzarTerminal(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -167,7 +179,12 @@ extern void avanzarTerminal(GtkWidget *button, gpointer estructura)
   return;
 }
 
-// Función que retrocede a la terminal anterior
+/**
+ * @brief Función que retrocede a la terminal anterior.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
+ */
 extern void retrocederTerminal(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -238,7 +255,12 @@ extern void retrocederTerminal(GtkWidget *button, gpointer estructura)
   return;
 }
 
-// Función que avanza al siguiente cliente
+/**
+ * @brief Función que avanza al siguiente cliente.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
+ */
 extern void avanzarCliente(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -360,7 +382,13 @@ extern void avanzarCliente(GtkWidget *button, gpointer estructura)
   return;
 }
 
-// Función que busca un cliente en el árbol binario usando el número de cuenta
+/**
+ * @brief Función que busca un cliente en el árbol binario usando el número de cuenta
+ *        y muestra su historial de compras en la ventana de búsqueda.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
+ */
 extern void buscarHistorial(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -407,6 +435,13 @@ extern void buscarHistorial(GtkWidget *button, gpointer estructura)
   return;
 }
 
+/**
+ * @brief Función que atiende la caja y actualiza la información de la terminal y el cliente.
+ *        obtiene los datos de los entries y verifica que sean válidos.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
+ */
 extern void atenderCajaGTK(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -508,7 +543,14 @@ extern void atenderCajaGTK(GtkWidget *button, gpointer estructura)
   gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry2), "");
 }
 
-// Función para atender terminales
+/**
+ * @brief Función que atiende la terminal actual y actualiza la información de la terminal y el cliente.
+ *        Si la terminal es de comida, atiende al primer cliente y lo elimina de la fila.
+ *        Si la terminal es caja, abre la ventana de atención de caja.
+ * @param button puntero al botón que se presionó
+ * @param estructura puntero a la estructura de la interfaz
+ * @return void
+ */
 extern void atender(GtkWidget *button, gpointer estructura)
 {
   inter *pt = (inter *)estructura;
@@ -622,7 +664,13 @@ extern void atender(GtkWidget *button, gpointer estructura)
   return;
 }
 
-// Función que evita la destrucción de widgets
+/**
+ * @brief Función que oculta la ventana al presionar el tache
+ * @param widget puntero al widget que se presionó
+ * @param event puntero al evento que se generó
+ * @param data puntero a la estructura de la interfaz
+ * @return gboolean
+ */
 gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
   gtk_widget_hide(widget); // Oculta la ventana
