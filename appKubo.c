@@ -128,9 +128,9 @@ int main(int argc, char *argv[])
     strcpy(principal.nombreArchivoArbol, argv[3]);
   }
 
-  // Posicionar el puntero a la terminal de caja
+  // Posicionar el puntero al inicio
   principal.terminalActual = principal.inicio;
-  // Posicionar el puntero al cliente de la terminal de caja
+  // Posicionar el puntero al primer cliente
   principal.clienteActual = principal.terminalActual->primero;
 
   printf("\n\tInicio de la aplicación\n\t");

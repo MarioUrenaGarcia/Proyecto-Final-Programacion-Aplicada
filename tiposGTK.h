@@ -145,6 +145,7 @@ struct interfazPrincipal
 
   // Variable que definirá en que terminal se encuentra el usuario posicionado en la interfaz
   nodoD *terminalActual;
+  
   // Variable que definirá en que cliente se encuentra el usuario posicionado en la interfaz
   nodoCola *clienteActual;
 

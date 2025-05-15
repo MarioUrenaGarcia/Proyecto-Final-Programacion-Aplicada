@@ -315,6 +315,16 @@ extern void avanzarCliente(GtkWidget *button, gpointer estructura)
         // Notifica que se avanzó al siguiente cliente
         gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Avanzaste al siguiente cliente");
       }
+      // Si el cliente actual es NULL
+      else if (pt->clienteActual == NULL)
+      {
+        // Actualiza la etiqueta del cliente
+        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+
+        // Actualiza la imagen del cliente
+        sprintf(auxString, "imagenes/exito.jpg");
+        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+      }
       else
       {
         // Si el cliente actual es el último, regresa al inicio
@@ -331,6 +341,19 @@ extern void avanzarCliente(GtkWidget *button, gpointer estructura)
         // Si el cliente actual es el último, notifica que no hay más clientes en la fila y regresa al inicio
         gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay más clientes en la fila, iniciando de nuevo");
       }
+    }
+    else
+    {
+      // Si la fila de clientes está vacía, no hay clientes
+      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+
+      // Actualiza la imagen del cliente
+      sprintf(auxString, "imagenes/exito.jpg");
+      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+      // Actualiza la etiqueta de la terminal
+      sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+      gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
     }
   }
 
@@ -400,54 +423,91 @@ extern void atenderCajaGTK(GtkWidget *button, gpointer estructura)
   }
   else // Si la caja no está vacía
   {
-    // Obtiene la comida y la cantidad del entry
-    sscanf(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry)), "%s", comida);
-    sscanf(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry2)), "%d", &cantidad);
-
-    // Si la comida es invalida
-    if ((strcmp(comida, "Pizzas") != 0) && (strcmp(comida, "Tacos") != 0))
+    if ((strcmp(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry)), "Tacos") == 0) || (strcmp(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry)), "Pizzas") == 0)) // El Entry 1 debe de ser Tacos o Pizzas
     {
-      // Notifica que la comida es inválida
+
+      // Obtiene la comida y la cantidad del entry
+      sscanf(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry)), "%s", comida);
+      sscanf(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry2)), "%d", &cantidad);
+
+      if (cantidad <= 0)
+      {
+        // Notifica que la cantidad es inválida
+        gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Cantidad inválida");
+      }
+      else
+      {
+        // Si no la entrada de cantudad está vacía
+        if (strcmp(gtk_entry_get_text(GTK_ENTRY(pt->atencionEntry2)), "") == 0)
+        {
+          // Notifica que la cantidad es inválida
+          gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Cantidad inválida");
+        }
+        else
+        {
+          // Un cliente en la caja
+          if (pt->terminalActual->primero == pt->terminalActual->ultimo)
+          {
+            // Atender la caja
+            atenderCaja(&pt->terminalActual, &pt->raiz, cantidad, comida);
+            borrarCliente(&pt->terminalActual);
+
+            pt->clienteActual = NULL;
+
+            // Actualiza la etiqueta del cliente notificando que no hay más clientes
+            gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
+            // Actualiza la imagen del cliente
+            sprintf(auxString, "imagenes/exito.jpg");
+            gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+            // Actualiza la etiqueta de la terminal
+            sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+            gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+          }
+          // Si hay más de un cliente
+          else
+          {
+            // En caso de que el cliente actual sea el atendido
+            if (pt->clienteActual == pt->terminalActual->primero)
+            {
+              pt->clienteActual = pt->clienteActual->next;
+            }
+
+            // Atender la caja
+            atenderCaja(&pt->terminalActual, &pt->raiz, cantidad, comida);
+            borrarCliente(&pt->terminalActual);
+
+            // Actualiza la etiqueta del cliente
+            sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+            gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+            // Actualiza imagen del cliente
+            sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+            gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+            // Actualiza la etiqueta de la terminal
+            sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+            gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+          }
+
+          // Notifica que se atendió la caja
+          gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Caja atendida");
+        }
+      }
+    }
+    else // Opción inválida
+    {
+      // Notifica que la opción es inválida
       gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Comida inválida");
     }
-    // Si la cantidad es inválida
-    else if (cantidad <= 0)
-    {
-      // Notifica que la cantidad es inválida
-      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Cantidad inválida");
-    }
-    else
-    {
-      atenderCaja(&pt->terminalActual, &pt->raiz, cantidad, comida);
-      borrarCliente(&pt->terminalActual);
-
-      pt->clienteActual = pt->clienteActual->next;
-
-      // Actualiza la etiqueta del cliente
-      sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
-      gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
-
-      // Actualiza imagen del cliente
-      sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
-      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
-
-      // Notifica que se avanzó al siguiente cliente
-      gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Caja Atendida");
-
-      printf(GREEN "\nCaja atendida\n" RESET);
-
-      // Actualiza la etiqueta de la terminal
-      sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
-      gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
-
-      // Reiniciar entries
-      gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry), "Pizzas / Tacos");
-      gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry2), "");
-      // Oculta la ventana de atención
-      gtk_widget_hide_all(pt->windowAtencion);
-    }
   }
+  // Oculta la ventana de atención
+  gtk_widget_hide_all(pt->windowAtencion);
+
+  // Reinicia los entries
+  gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry), "Pizzas / Tacos");
+  gtk_entry_set_text(GTK_ENTRY(pt->atencionEntry2), "");
 }
+
 // Función para atender terminales
 extern void atender(GtkWidget *button, gpointer estructura)
 {
@@ -481,18 +541,21 @@ extern void atender(GtkWidget *button, gpointer estructura)
     {
       // Notifica que no hay clientes en la fila
       gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "No hay clientes en la fila");
+
+      // Actualiza la imagen del cliente
+      sprintf(auxString, "imagenes/exito.jpg");
+      gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
     }
     else // Si la fila de clientes no está vacía
     {
 
-      // Atender el cliente
-      pt->clienteActual = pt->clienteActual->next;
-      borrarCliente(&pt->terminalActual);
-
       // Si la fila de clientes está vacía
-      if (pt->clienteActual == NULL)
+      if ((pt->terminalActual->primero == NULL) && (pt->terminalActual->ultimo == NULL))
       {
         // Actualiza la etiqueta del cliente
+        borrarCliente(&pt->terminalActual);
+        pt->clienteActual = NULL;
+
         gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
 
         // Actualiza la etiqueta de la terminal
@@ -508,17 +571,47 @@ extern void atender(GtkWidget *button, gpointer estructura)
       }
       else
       {
-        // Actualiza la etiqueta del cliente
-        sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
-        gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+        // Si hay un solo cliente
+        if (pt->terminalActual->primero == pt->terminalActual->ultimo)
+        {
+          borrarCliente(&pt->terminalActual);
+          pt->clienteActual = NULL;
 
-        // Actualiza imagen del cliente
-        sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
-        gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+          // Actualiza la etiqueta del cliente
+          gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), "No hay clientes en la fila");
 
-        // Actualiza la etiqueta de la terminal
-        sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
-        gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+          // Actualiza imagen del cliente
+          gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), "imagenes/exito.jpg");
+
+          // Notifica que se atendió la comida
+          gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Comida atendida");
+
+          // Actualiza la etiqueta de la terminal
+          sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+          gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+        }
+        else
+        {
+          // Si el cliente actual es el atendido
+          if (pt->clienteActual == pt->terminalActual->primero)
+          {
+            pt->clienteActual = pt->clienteActual->next;
+          }
+
+          borrarCliente(&pt->terminalActual);
+
+          // Actualiza la etiqueta del cliente
+          sprintf(auxString, "Cuenta: %d, Nombre: %s, Monedero: %.2f", pt->clienteActual->numCuenta, pt->clienteActual->nombre, pt->clienteActual->monedero);
+          gtk_label_set_text(GTK_LABEL(pt->clienteInfoLbl), auxString);
+
+          // Actualiza imagen del cliente
+          sprintf(auxString, "imagenes/%s.jpg", pt->clienteActual->nombre);
+          gtk_image_set_from_file(GTK_IMAGE(pt->clienteImg), auxString);
+
+          // Actualiza la etiqueta de la terminal
+          sprintf(auxString, "Terminal %s, %d clientes, $ %.2f", pt->terminalActual->terminal, pt->terminalActual->clientes, pt->terminalActual->montoAcumulado);
+          gtk_label_set_text(GTK_LABEL(pt->terminalInfoLbl), auxString);
+        }
 
         // Notifica que se avanzó al siguiente cliente
         gtk_label_set_text(GTK_LABEL(pt->notificacionesLbl), "Comida Atendida");

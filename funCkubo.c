@@ -516,6 +516,49 @@ extern void borrarCliente(nodoD **terminal)
 }
 
 /**
+ * @brief Función que elimina un cliente de la caja.
+ * @param **terminal Puntero a la lista doble que contiene los puestos de comida.
+ * @return void
+ */
+extern void borrarClienteCaja(nodoD **terminal)
+{
+    nodoCola *borra;
+
+    // Verificar si la cola está vacía
+    if ((*terminal)->primero == NULL && (*terminal)->ultimo == NULL)
+    {
+        printf(RED "\nLa cola %s está vacía" RESET, (*terminal)->terminal);
+    }
+    else
+    {
+        borra = (*terminal)->primero;
+
+        // Caso: Un solo cliente en la cola
+        if ((*terminal)->primero == (*terminal)->ultimo)
+        {
+            (*terminal)->primero = NULL;
+            (*terminal)->ultimo = NULL;
+        }
+        else // Caso: Más de un cliente en la cola
+        {
+            (*terminal)->primero = (*terminal)->primero->next;
+            (*terminal)->ultimo->next = NULL; // Mantener la circularidad
+        }
+
+        free(borra); // Liberar la memoria del cliente eliminado
+
+        // Actualizar el número de clientes y el monto acumulado
+        (*terminal)->clientes--;
+        (*terminal)->montoAcumulado -= borra->monedero;
+
+        printf(GREEN "\nCliente eliminado de la cola %s" RESET, (*terminal)->terminal);
+    }
+    return;
+}
+
+
+
+/**
  * @brief Función que inserta un nodoD en la lista doble.
  * @param first Puntero a la cabeza de la lista doble.
  * @param last Puntero a la cola de la lista doble.
